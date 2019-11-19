@@ -10,12 +10,15 @@ import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 
 public class Tree23<T extends Comparable<T>> {
 
 	private Node root;              // The root of the tree	
 	private int size;              // Number of elements inside of the tree
-	        
+	private boolean inRecursion = false;
+        private static boolean ESCAPE_RECURSION = false;
 	private static final int    ROOT_IS_BIGGER = 1;
 	private static final int    ROOT_IS_SMALLER = -1;
 
@@ -30,6 +33,76 @@ public class Tree23<T extends Comparable<T>> {
     public Tree23(Collection<T> elements) {
         this.root = new Node();
         this.size = 0;
+    }
+    
+    
+    
+    
+       public void inOrder(String keyword, DefaultListModel model,  JList list) {
+                if(!keyword.isEmpty()){
+                    if(root==null) {
+                    System.out.println("The tree is empty");
+                    }else{
+                        try{
+                          inOrderI(root, keyword, model, list);
+                        }catch(EscapeRecursionException e){
+                            System.out.println("Bega is rekursijos");
+                        }
+                    }
+                }
+           
+		
+	}
+       
+       public void cancelRecursion(){
+           if(inRecursion){
+                ESCAPE_RECURSION = true;
+           }
+       }
+       
+       public void continueRecursion(){
+           inRecursion = false;
+           ESCAPE_RECURSION = false;
+       }
+
+	private void inOrderI(Node current, String keyword, DefaultListModel model, JList list) throws EscapeRecursionException{
+            inRecursion = true;
+            if(ESCAPE_RECURSION){
+                continueRecursion();
+                throw new EscapeRecursionException();
+            }
+		if(current != null) {
+			if(current.isLeaf()) {
+                                addIfContains(keyword, current.leftElement.toString(), model);
+                                list.setModel(model);
+				System.out.println(current.getLeftElement().toString());
+				if(current.rightElement != null){
+                                    addIfContains(keyword, current.rightElement.toString(), model);
+                                    System.out.println(current.rightElement.toString());
+                                }
+			}
+			else {
+				inOrderI(current.left, keyword, model, list);
+                                addIfContains(keyword, current.leftElement.toString(), model);
+                                list.setModel(model);
+				System.out.println(current.getLeftElement().toString());
+				inOrderI(current.mid, keyword, model, list);
+				if(current.rightElement != null) {
+					if(!current.isLeaf()){
+                                            addIfContains(keyword, current.rightElement.toString(), model);
+                                            list.setModel(model);
+                                            System.out.println(current.rightElement.toString());
+                                        }
+					inOrderI(current.right, keyword, model, list);
+				}
+			}
+		}
+	}  
+    
+    private void addIfContains(String keyword, String target, DefaultListModel model){
+        if(target.contains(keyword)){
+            model.addElement(target);
+        }
     }
     
     public void addFromFile(String fileName){
@@ -47,9 +120,7 @@ public class Tree23<T extends Comparable<T>> {
             
     }
     
-    
-
-
+   
 	/**
 	 * Adds a new element to the tree keeping it balanced.
 	 *
@@ -75,8 +146,6 @@ public class Tree23<T extends Comparable<T>> {
 		if(!addition) size--;
 		return addition;
 	}
-        
-        
         
         public boolean get(T element){
             if(root == null || element == null){
@@ -279,6 +348,10 @@ public class Tree23<T extends Comparable<T>> {
                 private boolean is3Node() {
 
 		    return rightElement != null; // also, right node is not null but this will be always true if rightElement <> null
+                }
+                
+                private boolean has3Nodes(){
+                    return left != null && mid != null && right != null;
                 }
 	
 	}
