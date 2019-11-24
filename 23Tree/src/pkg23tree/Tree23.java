@@ -2,12 +2,9 @@
 package pkg23tree;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Scanner;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -16,7 +13,7 @@ import javax.swing.JList;
 public class Tree23<T extends Comparable<T>> {
 
 	private Node root;              // The root of the tree	
-	private int size;              // Number of elements inside of the tree
+	public int size;              // Number of elements inside of the tree
 	private boolean inRecursion = false;
         private static boolean ESCAPE_RECURSION = false;
 	private static final int    ROOT_IS_BIGGER = 1;
@@ -36,15 +33,14 @@ public class Tree23<T extends Comparable<T>> {
     }
     
     
-    
-    
        public void inOrder(String keyword, DefaultListModel model,  JList list) {
-                if(!keyword.isEmpty()){
+           
+                if(keyword.length()>1){
                     if(root==null) {
                     System.out.println("The tree is empty");
                     }else{
                         try{
-                          inOrderI(root, keyword, model, list);
+                          inOrderI(root, keyword.toLowerCase(), model, list);
                         }catch(EscapeRecursionException e){
                             System.out.println("Bega is rekursijos");
                         }
@@ -65,33 +61,24 @@ public class Tree23<T extends Comparable<T>> {
            ESCAPE_RECURSION = false;
        }
 
-	private void inOrderI(Node current, String keyword, DefaultListModel model, JList list) throws EscapeRecursionException{
-            inRecursion = true;
-            if(ESCAPE_RECURSION){
-                continueRecursion();
-                throw new EscapeRecursionException();
-            }
+	private void inOrderI(Node current, String keyword, DefaultListModel model, JList list) throws EscapeRecursionException{  
 		if(current != null) {
 			if(current.isLeaf()) {
                                 addIfContains(keyword, current.leftElement.toString(), model);
                                 list.setModel(model);
-				System.out.println(current.getLeftElement().toString());
 				if(current.rightElement != null){
                                     addIfContains(keyword, current.rightElement.toString(), model);
-                                    System.out.println(current.rightElement.toString());
                                 }
 			}
 			else {
 				inOrderI(current.left, keyword, model, list);
                                 addIfContains(keyword, current.leftElement.toString(), model);
                                 list.setModel(model);
-				System.out.println(current.getLeftElement().toString());
 				inOrderI(current.mid, keyword, model, list);
 				if(current.rightElement != null) {
 					if(!current.isLeaf()){
                                             addIfContains(keyword, current.rightElement.toString(), model);
                                             list.setModel(model);
-                                            System.out.println(current.rightElement.toString());
                                         }
 					inOrderI(current.right, keyword, model, list);
 				}
@@ -100,8 +87,8 @@ public class Tree23<T extends Comparable<T>> {
 	}  
     
     private void addIfContains(String keyword, String target, DefaultListModel model){
-        if(target.contains(keyword)){
-            model.addElement(target);
+        if(target.startsWith(keyword)){
+            model.addElement(highlightedString(target, keyword));
         }
     }
     
@@ -115,19 +102,8 @@ public class Tree23<T extends Comparable<T>> {
                 }   } catch (IOException ex) {
                 Logger.getLogger(Tree23.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            System.out.println(size);
-            
     }
     
-   
-	/**
-	 * Adds a new element to the tree keeping it balanced.
-	 *
-	 * @param element The element to add
-	 *
-	 * @return If the element has been added (true) or not because it already exists (false)
-	 */
 	public boolean add(T element) {
 		size++;
 		addition = false;
@@ -154,14 +130,18 @@ public class Tree23<T extends Comparable<T>> {
             return getI(root, element);
         }
         
-           
+          
+        private String highlightedString(String word, String target){
+            String temp = word.substring(target.length(), word.length());
+            return "<html><font color=black><b>"+target+"</b></font>"+"<font color=black>"+temp+"</font></html>";
+        }
+
         
         private boolean getI(Node node, T element){
             int cmpLeft = element.compareTo(node.leftElement);
             if(cmpLeft == 0){
                 return true;
             }else{
-                //Tikrinu ta ior ta
                 if(node.is3Node()){
                     int cmpRight = element.compareTo(node.rightElement);
                     if(cmpRight == 0){
@@ -193,7 +173,6 @@ public class Tree23<T extends Comparable<T>> {
 	private Node addElementI(Node current, T element) {
 
 		Node newParent = null;
-
 		// We aren't in the deepest level yet
 		if(!current.isLeaf()) {
 		    Node sonAscended = null;
