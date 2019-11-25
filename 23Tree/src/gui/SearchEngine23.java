@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pkg23tree;
+package gui;
 
+import core.Tree23;
 import javax.swing.DefaultListModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -22,7 +23,7 @@ public class SearchEngine23 extends javax.swing.JFrame {
      */
     public SearchEngine23() {
         initComponents();
-        tree.addFromFile("/Users/b/Desktop/2-3-Tree/23Tree/src/pkg23tree/words_alpha.txt");   
+        tree.addFromFile("/Users/b/Desktop/2-3-Tree/23Tree/src/pkg23tree/words/words.txt");   
         jTextField1.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
@@ -119,7 +120,6 @@ public class SearchEngine23 extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3)
